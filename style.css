@@ -1,0 +1,31 @@
+td {
+    border: solid 1px black;
+    margin: 5px;
+    width: 30px;
+    height: 10px;
+}
+
+#gameTable {
+    border: solid 1px black;
+    padding: 5px;
+}
+
+#playerOneContainer {
+    position: relative;
+    display: inline-block;
+}
+
+#gameTableContainer {
+    display: inline-block;
+    position: relative;
+}
+
+#playerTwoContainer {
+    display: inline-block;
+    position: relative;
+}
+
+#playerTwoTurn {
+    display: inline-block;
+    position: relative;
+}

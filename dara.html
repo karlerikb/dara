@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Dara</title>
+</head>
+<body>
+
+    <!-- rida mängufaasi näitamiseks -->
+    <div class="row">
+        <div id="gamePhase" class="col-md-12 text-center">
+            <p>Esimene faas - paiguta nupud lauale</p>
+        </div>
+    </div>
+
+    <!-- rida mängija nuppude ja mängulaua jaoks -->
+    <div class="row">
+        <!-- mängija siniste nuppudega -->
+        <div id="pOneColumn" class="col-md-3 text-center">
+            <p>Mängija 1 (sinine)</p>
+            <div id="playerOneContainer">
+                <table id="playerOne">
+                    <tr><td id="pOne11">11</td><td id="pOne12">12</td></tr>
+                    <tr><td id="pOne21">21</td><td id="pOne22">22</td></tr>
+                    <tr><td id="pOne31">31</td><td id="pOne32">32</td></tr>
+                    <tr><td id="pOne41">41</td><td id="pOne42">42</td></tr>
+                    <tr><td id="pOne51">51</td><td id="pOne52">52</td></tr>
+                    <tr><td id="pOne61">61</td><td id="pOne62">62</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- mängulaud -->
+        <div id="gameTableColumn" class="col-md-6 text-center">
+            <p>Mängulaud</p>
+            <div id="gameTableContainer">
+                <table id="gameTable">
+                    <tr><td id="pos11">11</td><td id="pos12">12</td><td id="pos13">13</td><td id="pos14">14</td><td id="pos15">15</td><td id="pos16">16</td></tr>
+                    <tr><td id="pos21">21</td><td id="pos22">22</td><td id="pos23">23</td><td id="pos24">24</td><td id="pos25">25</td><td id="pos26">26</td></tr>
+                    <tr><td id="pos31">31</td><td id="pos32">32</td><td id="pos33">33</td><td id="pos34">34</td><td id="pos35">35</td><td id="pos36">36</td></tr>
+                    <tr><td id="pos41">41</td><td id="pos42">42</td><td id="pos43">43</td><td id="pos44">44</td><td id="pos45">45</td><td id="pos46">46</td></tr>
+                    <tr><td id="pos51">51</td><td id="pos52">52</td><td id="pos53">53</td><td id="pos54">54</td><td id="pos55">55</td><td id="pos56">56</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- mängija punaste nuppudega -->
+        <div id="pTwoColumn" class="col-md-3 text-center">
+            <p>Mängija 2 (punane)</p>
+            <div id="playerTwoContainer">
+                <table id="playerTwo">
+                    <tr><td id="pTwo11">11</td><td id="pTwo12">12</td></tr>
+                    <tr><td id="pTwo21">21</td><td id="pTwo22">22</td></tr>
+                    <tr><td id="pTwo31">31</td><td id="pTwo32">32</td></tr>
+                    <tr><td id="pTwo41">41</td><td id="pTwo42">42</td></tr>
+                    <tr><td id="pTwo51">51</td><td id="pTwo52">52</td></tr>
+                    <tr><td id="pTwo61">61</td><td id="pTwo62">62</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- rida mängukorra näitamiseks -->
+    <div class="row">
+        <div id="playerOneTurn" class="col-md-3 text-center"></div>
+        <div class="col-md-6 text-center"></div>
+        <div id="playerTwoTurn" class="col-md-3 text-center"></div>
+    </div>
+
+</body>
+</html>

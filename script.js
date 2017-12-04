@@ -25,18 +25,12 @@ const pos51 = document.getElementById("pos51"), pos52 = document.getElementById(
 /* kolmeste ridade kombinatsioonide loomine */
 let threeInRowCombinationsArray = [];
 let threeInRowCombinationsObject = {};
-let bluePieces = {
-    horizontal: { pos1X: [], pos2X: [], pos3X: [], pos4X: [], pos5X: []},
-    vertical: { posX1: [], posX2: [], posX3: [], posX4: [], posX5: [], posX6: []}
-}
-let redPieces = {
-    horizontal: { pos1X: [], pos2X: [], pos3X: [], pos4X: [], pos5X: []},
-    vertical: { posX1: [], posX2: [], posX3: [], posX4: [], posX5: [], posX6: []}
-}
+let movePiecesCombinationsObject = {};
 
 for(let i = 1; i <= 5; i++) {
     for(let j = 1; j <= 6; j++) {
         threeInRowCombinationsObject["pos" + i + j] = [];
+        movePiecesCombinationsObject["pos" + i + j] = [];
     }
 }
 
@@ -75,9 +69,6 @@ let jsonstring = JSON.stringify(threeInRowCombinationsObject);
 let duplicateCombinationsObject = JSON.parse(jsonstring);
 let duplicateCombinationsObject2 = JSON.parse(jsonstring);
 
-console.log(duplicateCombinationsObject);
-console.log(duplicateCombinationsObject2);
-
 
 /* mängulauale klikkides vahetab mängija korda */
 const pOnePieces = document.querySelectorAll("#playerOne > tbody > tr > td");
@@ -108,7 +99,30 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
             player = "red";
         }
     }
+
+    /* teise faasi jõudmine */
+    if(pOnePieceCount + pTwoPieceCount === 24) {
+        document.querySelector("#gamePhase > p").innerHTML = "Teine faas - liiguta nuppe kolmestesse ridadesse";
+        
+        /* esimese asjana eemaldan kõik eelmise faasi eventlistenerid */
+        for(let i = 1; i <= 5; i++) {
+            for(let j = 1; j <= 6; j++) {
+                let elPos = "pos" + i + j;
+                document.getElementById(elPos).removeEventListener("click", addPiecesMethodObject[elPos]);
+            }
+        }
+        changeTurn = false;
+
+        if(secondPhaseEventListeners) {
+            eventListenersForSecondPhase();
+            secondPhaseEventListeners = false;
+        }
+    }
 });
+
+
+let secondPhaseEventListeners = true;
+
 
 /* eemaldab mängijate nuppe kui need lauale asetatakse */
 let pOnePieceCount = 0;
@@ -118,25 +132,22 @@ let pOnePositions = [];
 let pTwoPositions = [];
 let pOneProhibitedPositions = [];
 let pTwoProhibitedPositions = [];
-const gameTablePieces = document.querySelectorAll("#gameTable > tbody > tr > td");
+let addPiecesMethodObject = {};
+let movePiecesMethodObject = {};
 
+
+/* eventlistenerid esimese faasi jaoks */
 for(let i = 1; i <= 5; i++) {
     for(let j = 1; j <= 6; j++) {
-        gameTableObject["pos" + i + j] = "empty";
-        document.getElementById("pos" + i + j).addEventListener("click", () => {
+        let elPos = "pos" + i + j;
+        /* loon iga lauapositsiooni objekti jaoks funktsiooni ja salvestan muutujasse, et hiljem kasutada saaks */
+        addPiecesMethodObject[elPos] = function() {
             changeTurn = false;
-
-            if(player === "blue" && pOnePieceCount < 12 && !pOneProhibitedPositions.includes("pos"+i+j) && !pOnePositions.includes("pos"+i+j)) {
-                document.getElementById("pos" + i + j).style.backgroundColor = "#0074D9";
-                gameTableObject["pos" + i + j] = "blue";
-                pOnePositions.push("pos" + i + j);
-                pTwoProhibitedPositions.push("pos"+i+j);
-
-                bluePieces.horizontal["pos" + i + "X"].push("pos" + i + j);
-                bluePieces.vertical["pos" + "X" + j].push("pos" + i + j);
-
-                bluePieces.horizontal["pos" + i + "X"].sort();
-                bluePieces.vertical["pos" + "X" + j].sort();
+            if(player === "blue" && pOnePieceCount < 12 && !pOneProhibitedPositions.includes(elPos) && !pOnePositions.includes(elPos)) {
+                document.getElementById(elPos).style.backgroundColor = "#0074D9";
+                gameTableObject[elPos] = "blue";
+                pOnePositions.push(elPos);
+                pTwoProhibitedPositions.push(elPos);
 
                 if(pOnePositions.length > 0) {
                     for(let i = 0; i < pOnePositions.length; i++) {
@@ -166,23 +177,16 @@ for(let i = 1; i <= 5; i++) {
                         }
                     }
                 }
-
                 pOnePieces[pOnePieceCount].style.display = "none";
                 pOnePieceCount++;
                 changeTurn = true;
             }
 
-            if(player === "red" && pTwoPieceCount < 12 && !pTwoProhibitedPositions.includes("pos"+i+j) && !pTwoPositions.includes("pos"+i+j)) {
-                document.getElementById("pos" + i + j).style.backgroundColor = "#B22222";
-                gameTableObject["pos" + i + j] = "red";
-                pTwoPositions.push("pos" + i + j);
-                pOneProhibitedPositions.push("pos"+i+j);
-
-                redPieces.horizontal["pos" + i + "X"].push("pos" + i + j);
-                redPieces.vertical["pos" + "X" + j].push("pos" + i + j);
-
-                bluePieces.horizontal["pos" + i + "X"].sort();
-                bluePieces.vertical["pos" + "X" + j].sort();
+            if(player === "red" && pTwoPieceCount < 12 && !pTwoProhibitedPositions.includes(elPos) && !pTwoPositions.includes(elPos)) {
+                document.getElementById(elPos).style.backgroundColor = "#B22222";
+                gameTableObject[elPos] = "red";
+                pTwoPositions.push(elPos);
+                pOneProhibitedPositions.push(elPos);
 
                 if(pTwoPositions.length > 0) {
                     for(let i = 0; i < pTwoPositions.length; i++) {
@@ -216,6 +220,217 @@ for(let i = 1; i <= 5; i++) {
                 pTwoPieceCount++;
                 changeTurn = true;
             }
-        });
+        }
     }
 }
+
+
+
+/* esimese faasi eventlistenerid pannakse lauaobjektidele külge */
+for(let i = 1; i <= 5; i++) {
+    for(let j = 1; j <= 6; j++) {
+        let elPos = "pos" + i + j;
+        gameTableObject[elPos] = "empty";
+        document.getElementById(elPos).addEventListener("click", addPiecesMethodObject[elPos]);
+    }
+}
+
+
+/* tekitan teise faasi jaoks nupu liigutamise võimaluste kombinatsioonid */
+for(let i = 1; i <= 5; i++) {
+    for(let j = 1; j <= 6; j++) {
+        let elPos = "pos" + i + j;
+        for(let k = 0; k < 4; k++) {
+            let up = i - 1, down = i + 1, left = j - 1, right = j + 1;
+            if (up >= 1 && !movePiecesCombinationsObject[elPos].includes("pos" + up + j)) 
+                movePiecesCombinationsObject[elPos].push("pos" + up + j);
+            if (left >= 1 && !movePiecesCombinationsObject[elPos].includes("pos" + i + left)) 
+                movePiecesCombinationsObject[elPos].push("pos" + i + left);
+            if (right <= 6 && !movePiecesCombinationsObject[elPos].includes("pos" + i + right)) 
+                movePiecesCombinationsObject[elPos].push("pos" + i + right);
+            if (down <= 5 && !movePiecesCombinationsObject[elPos].includes("pos" + down + j)) 
+                movePiecesCombinationsObject[elPos].push("pos" + down + j);
+        }
+    }
+}
+
+
+let greenPositionsObject = {};
+let greenPositions = [];
+let currentPos;
+
+/* eventlistenerid teise faasi jaoks */
+function eventListenersForSecondPhase() {
+
+    for(let i = 1; i <= 5; i++) {
+        for(let j = 1; j <= 6; j++) {
+            let elPos = "pos" + i + j;
+
+            /* tekitan funktsioonid, mis pannakse massiivi, et kasutada neid hiljem eventlistenerides */
+            movePiecesMethodObject[elPos] = function() {
+                changeTurn = false;
+
+                /* eemaldan vanad eventlistenerid kui peaksid alles olema nuppude vahetusest, et uusi ei lisataks nende peale */
+                if(greenPositions.length > 0) {
+                    greenPositions.forEach(greenPosition => {
+                        console.log(greenPosition + " eemaldan eventlisteneri");
+                        document.getElementById(greenPosition).removeEventListener("click", greenPositionsObject[greenPosition]);
+                    });
+                    greenPositions = [];
+                }
+
+                if(player === "blue" && pOnePositions.includes(elPos)) {
+                    console.log("blue positions " + pOnePositions);
+                    console.log(elPos);
+                    console.log(gameTableObject[elPos]);
+
+                    for(let i = 1; i <= 5; i++) {
+                        for(let j = 1; j <= 6; j++) {
+                            let elPos = "pos" + i + j;
+                            if (gameTableObject[elPos] === "empty")
+                                document.getElementById(elPos).style.backgroundColor = "white";
+                            if (gameTableObject[elPos] === "blue")
+                                document.getElementById(elPos).style.color = "black";
+                        }
+                    }
+                    /* selle nupu millel vajutan teen teksti kollaseks */
+                    document.getElementById(elPos).style.color = "gold";
+
+                    /* vajutatud nupu võimalikud käidavad positsioonid tehakse roheliseks ja pannakse massiivi */
+                    
+                    movePiecesCombinationsObject[elPos].forEach(movePos => {
+                        if (gameTableObject[movePos] === "empty") {
+                            document.getElementById(movePos).style.backgroundColor = "lightgreen";
+                            if (!greenPositions.includes(movePos)) greenPositions.push(movePos);
+                        }
+                    });
+                    console.log("green positions " + greenPositions);
+
+                    /* tekitan funktsioonid eventlisteneri jaoks roheliste positsioonide jaoks */
+                    greenPositions.forEach(greenPos => greenPositionsObject[greenPos] = function() {
+                        /* sinine nupp tehakse vabaks nupuks sest liigutan sellel asuva nupu sealt ära */
+                        gameTableObject[elPos] = "empty";
+                        document.getElementById(elPos).style.backgroundColor = "white";
+                        document.getElementById(elPos).style.color = "black";
+                        
+                        /* kõik rohelised nupud tehakse valgeks */
+                        greenPositions.forEach(allGreenPos => {
+                            document.getElementById(allGreenPos).style.backgroundColor = "white";
+                        });
+
+                        /* roheline nupp millel vajutatakse tehakse siniseks nupuks */
+                        gameTableObject[greenPos] = "blue";
+                        document.getElementById(greenPos).style.backgroundColor = "#0074D9";
+
+                        /* eemaldan vana sinise nupu siniste massiivist ja panen uue asemele */
+                        for(let k = 0; k < pOnePositions.length; k++) {
+                            if (pOnePositions[k] === elPos) pOnePositions.splice(k, 1);
+                        }
+                        pOnePositions.push(greenPos);
+
+                        /* kohandan nuppude liigutamise eventlistenerid */
+                        document.getElementById(elPos).removeEventListener("click", movePiecesMethodObject[elPos]);
+                        document.getElementById(greenPos).addEventListener("click", movePiecesMethodObject[greenPos]);
+
+
+                        /* eemaldan käima pandud evenlistenerid */
+                        greenPositions.forEach(greenPosition => {
+                            console.log(greenPosition + " eemaldan eventlisteneri");
+                            document.getElementById(greenPosition).removeEventListener("click", greenPositionsObject[greenPosition]);
+                        });
+                        greenPositions = [];
+                        /* muudan käigu korda */
+                        changeTurn = true;
+                    });
+
+                    /* panen eventlistenerid külge ja käivitan eelneva funktsiooni */
+                    greenPositions.forEach(greenPosition => {
+                        console.log(greenPosition + " saab eventlisteneri");
+                        document.getElementById(greenPosition).addEventListener("click", greenPositionsObject[greenPosition]);
+                    });
+                }
+
+
+    
+                if(player === "red" && pTwoPositions.includes(elPos)) {
+
+                    for(let i = 1; i <= 5; i++) {
+                        for(let j = 1; j <= 6; j++) {
+                            let elPos = "pos" + i + j;
+                            if (gameTableObject[elPos] === "empty")
+                                document.getElementById(elPos).style.backgroundColor = "white";
+                            if (gameTableObject[elPos] === "red")
+                                document.getElementById(elPos).style.color = "black";
+                        }
+                    }
+                    /* selle nupu millel vajutan teen teksti kollaseks */
+                    document.getElementById(elPos).style.color = "gold";
+
+                    /* vajutatud nupu võimalikud käidavad positsioonid tehakse roheliseks ja pannakse massiivi */
+                    
+                    movePiecesCombinationsObject[elPos].forEach(movePos => {
+                        if (gameTableObject[movePos] === "empty") {
+                            document.getElementById(movePos).style.backgroundColor = "lightgreen";
+                            if (!greenPositions.includes(movePos)) greenPositions.push(movePos);
+                        }
+                    });
+                    console.log(greenPositions);
+
+                    /* tekitan funktsioonid eventlisteneri jaoks roheliste positsioonide jaoks */
+                    greenPositions.forEach(greenPos => greenPositionsObject[greenPos] = function() {
+                        /* punane nupp tehakse vabaks nupuks sest liigutan sellel asuva nupu sealt ära */
+                        gameTableObject[elPos] = "empty";
+                        document.getElementById(elPos).style.backgroundColor = "white";
+                        document.getElementById(elPos).style.color = "black";
+                        
+                        /* kõik rohelised nupud tehakse valgeks */
+                        greenPositions.forEach(allGreenPos => {
+                            document.getElementById(allGreenPos).style.backgroundColor = "white";
+                        });
+
+                        /* roheline nupp millel vajutatakse tehakse punaseks nupuks */
+                        gameTableObject[greenPos] = "red";
+                        document.getElementById(greenPos).style.backgroundColor = "#B22222";
+
+                        /* eemaldan vana punase nupu punaste massiivist ja panen uue asemele */
+                        for(let k = 0; k < pTwoPositions.length; k++) {
+                            if (pTwoPositions[k] === elPos) pTwoPositions.splice(k, 1);
+                        }
+                        pTwoPositions.push(greenPos);
+
+                        /* kohandan nuppude liigutamise eventlistenerid */
+                        document.getElementById(elPos).removeEventListener("click", movePiecesMethodObject[elPos]);
+                        document.getElementById(greenPos).addEventListener("click", movePiecesMethodObject[greenPos]);
+
+                        /* eemaldan käima pandud evenlistenerid */
+                        greenPositions.forEach(greenPosition => {
+                            console.log(greenPosition + "eemaldab eventlisteneri");
+                            document.getElementById(greenPosition).removeEventListener("click", greenPositionsObject[greenPosition]);
+                        });
+                        greenPositions = [];
+                        /* muudan käigu korda */
+                        changeTurn = true;
+                    });
+
+                    greenPositions.forEach(greenPosition => {
+                        console.log(greenPosition + "saab eventlisteneri");
+                        document.getElementById(greenPosition).addEventListener("click", greenPositionsObject[greenPosition]);
+                    });
+                }
+            }
+        }
+    }
+    pOnePositions.forEach(pOnePos => {
+        console.log(pOnePos + "saab eventlisteneri");
+        document.getElementById(pOnePos).addEventListener("click", movePiecesMethodObject[pOnePos]);
+    });
+    pTwoPositions.forEach(pTwoPos => {
+        console.log(pTwoPos + "saab eventlisteneri");
+        document.getElementById(pTwoPos).addEventListener("click", movePiecesMethodObject[pTwoPos]);
+    });
+    
+}
+
+
+
+

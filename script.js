@@ -24,16 +24,22 @@ const pos51 = document.getElementById("pos51"), pos52 = document.getElementById(
 
 /* kolmeste ridade kombinatsioonide loomine */
 let threeInRowCombinationsArray = [];
+let fourInRowCombinationsArray = [];
 let threeInRowCombinationsObject = {};
+let fourInRowCombinationsObject = {};
 let movePiecesCombinationsObject = {};
 
+/* tekitan iga nupu jaoks objekti tühja array */
 for(let i = 1; i <= 5; i++) {
     for(let j = 1; j <= 6; j++) {
         threeInRowCombinationsObject["pos" + i + j] = [];
         movePiecesCombinationsObject["pos" + i + j] = [];
+        fourInRowCombinationsObject["pos" + i + j] = [];
     }
 }
 
+/* tekitan kolmeste kombinatsioonide massiivid ja panen need objekti */
+/* horisontaalsed kombinatsioonid */
 for(let i = 1; i <= 5; i++) {
     for(let j = 1; j <= 6; j++) {
         let threeInRow = [];
@@ -48,7 +54,7 @@ for(let i = 1; i <= 5; i++) {
         }
     }
 }
-
+/* vertikaalsed kombinatsioonid */
 for(let j = 1; j <= 6; j++) {
     for(let i = 1; i <= 5; i++) {
         let threeInRow = [];
@@ -64,10 +70,47 @@ for(let j = 1; j <= 6; j++) {
     }
 }
 
+/* tekitan neljaste kombinatsioonide massiivid ja panen need objekti */
+/* horisontaalsed kombinatsioonid */
+for(let i = 1; i <= 5; i++) {
+    for(let j = 1; j <= 6; j++) {
+        let fourInRow = [];
+        for(let k = 0; k < 4; k++) {
+            if(j <= 3) {
+                fourInRow.push("pos" + i + (j+k));
+            }
+        }
+        fourInRow.forEach(position => fourInRowCombinationsObject[position].push(fourInRow));
+        if(j <= 3) {
+            fourInRowCombinationsArray.push(fourInRow);
+        }
+    }
+}
+/* vertikaalsed kombinatsioonid */
+for(let j = 1; j <= 6; j++) {
+    for(let i = 1; i <= 5; i++) {
+        let fourInRow = [];
+        for(let k = 0; k < 4; k++) {
+            if(i <= 2) {
+                fourInRow.push("pos" + (i+k) + j);
+            }
+        }
+        fourInRow.forEach(position => fourInRowCombinationsObject[position].push(fourInRow));
+        if(i <= 2) {
+            fourInRowCombinationsArray.push(fourInRow);
+        }
+    }
+}
 
+/* duplikaatobjektid kolmeste ridade lisamise jaoks */
 let jsonstring = JSON.stringify(threeInRowCombinationsObject);
 let duplicateCombinationsObject = JSON.parse(jsonstring);
 let duplicateCombinationsObject2 = JSON.parse(jsonstring);
+
+/* duplikaatobjektid neljaste ridade jaoks */
+let jsonstring2 = JSON.stringify(fourInRowCombinationsObject);
+let fourInRowDuplicateObject = JSON.parse(jsonstring2);
+let fourInRowDuplicateObject2 = JSON.parse(jsonstring2);
 
 
 /* mängulauale klikkides vahetab mängija korda */
@@ -79,9 +122,11 @@ let count = 0;
 let player = "blue";
 let changeTurn = true;
 
+/* algväärtustan mängu alguse */
 pOneTurn.innerHTML = "sinise kord"
 pOnePieces.forEach(piece => piece.style.backgroundColor = "#0074D9");
 
+/* mängija käigukorra vahetamine */
 document.getElementById("gameTableContainer").addEventListener("click", () => {
     if(changeTurn) {
         count++;
@@ -101,7 +146,7 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
     }
 
     /* teise faasi jõudmine */
-    if(pOnePieceCount + pTwoPieceCount === 24) {
+    if(pOnePieceCount + pTwoPieceCount === 10) {
         document.querySelector("#gamePhase > p").innerHTML = "Teine faas - liiguta nuppe kolmestesse ridadesse";
         
         /* esimese asjana eemaldan kõik eelmise faasi eventlistenerid */
@@ -112,6 +157,8 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
             }
         }
         changeTurn = false;
+        pOneProhibitedPositions = [];
+        pTwoProhibitedPositions = [];
 
         if(secondPhaseEventListeners) {
             eventListenersForSecondPhase();
@@ -143,34 +190,53 @@ for(let i = 1; i <= 5; i++) {
         /* loon iga lauapositsiooni objekti jaoks funktsiooni ja salvestan muutujasse, et hiljem kasutada saaks */
         addPiecesMethodObject[elPos] = function() {
             changeTurn = false;
+
+            /* kui on sinise mängija kord, nuppe on vähem kui 12, klõpsatav lauakoht ei kuulu keelatud positsioonidesse ega omaenda positsioonidesse */
             if(player === "blue" && pOnePieceCount < 12 && !pOneProhibitedPositions.includes(elPos) && !pOnePositions.includes(elPos)) {
+                
+                /* paneb nupu lauale */
                 document.getElementById(elPos).style.backgroundColor = "#0074D9";
                 gameTableObject[elPos] = "blue";
                 pOnePositions.push(elPos);
                 pTwoProhibitedPositions.push(elPos);
 
+                /*  */
                 if(pOnePositions.length > 0) {
+                    /* käiakse läbi kõik sinise mängija nupud laual */
                     for(let i = 0; i < pOnePositions.length; i++) {
+                        /* pos on mingi positsioon sinise mängija nuppudest laual */
                         let pos = pOnePositions[i];
+                        /* käiakse läbi kõik kombinatsioonid kus esineb positsioon millel laual vajutati */
                         for(let j = 0; j < duplicateCombinationsObject[pos].length; j++) {
                             for(let k = 0; k < duplicateCombinationsObject[pos][j].length; k++) {
+                                /* käiakse läbi individuaalse kombinatsiooni liikmed */
                                 if(duplicateCombinationsObject[pos][j][k] === pos) {
+                                    /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
                                     duplicateCombinationsObject[pos][j].splice(k, 1);
                                 }
                             }
                         }
+                        /* eemaldan kõik sinsed positsioonid kombinatsioonide arrayst */
+                        /* saan kõikide positsioonide nimetused */
                         for(let position in duplicateCombinationsObject) {
+                            /* käin läbi kõik kombinatsioonid mis vastavad klikitud positsioonile */
                             duplicateCombinationsObject[position].forEach(combination => {
+                                /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
                                 for(let l = 0; l < combination.length; l++) {
+                                    /* käin läbi individuaalse kombinatsiooniarray */
                                     if(combination[l] === pos) {
+                                        /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
                                         combination.splice(l, 1);
                                     }
                                 }
                             });
                         }
+                        /* leian kõik kombinatsioonid mille pikkus on üks, ehk selle lisamisel tekiks kolmene rida, lisan selle viimase elemendi keelatud positsioonide arraysse */
                         for(let prohibited in duplicateCombinationsObject) {
                             duplicateCombinationsObject[prohibited].forEach(prohibitedPos => {
+                                /* kombinatsiooniarray pikkus on 1 ja positsioon ei ole juba lisatud keelatud arraysse */
                                 if(prohibitedPos.length === 1 && !pOneProhibitedPositions.includes(prohibitedPos[0])) {
+                                    /* lisan positsiooni keelatud arraysse */
                                     pOneProhibitedPositions.push(prohibitedPos[0]);
                                 }
                             });
@@ -273,16 +339,65 @@ function eventListenersForSecondPhase() {
                 /* eemaldan vanad eventlistenerid kui peaksid alles olema nuppude vahetusest, et uusi ei lisataks nende peale */
                 if(greenPositions.length > 0) {
                     greenPositions.forEach(greenPosition => {
-                        console.log(greenPosition + " eemaldan eventlisteneri");
+                        //console.log(greenPosition + " eemaldan eventlisteneri");
                         document.getElementById(greenPosition).removeEventListener("click", greenPositionsObject[greenPosition]);
                     });
                     greenPositions = [];
                 }
 
-                if(player === "blue" && pOnePositions.includes(elPos)) {
-                    console.log("blue positions " + pOnePositions);
-                    console.log(elPos);
-                    console.log(gameTableObject[elPos]);
+                if(player === "blue" && pOnePositions.includes(elPos) && !pOneProhibitedPositions.includes(elPos)) {
+
+                    /* neljase rea loogika */
+                    
+                    /* iga kord uue duplikaatobjekti neljaste ridade loogika jaoks */
+                    let fourInRowDuplicateObject = JSON.parse(jsonstring2);
+                    /* käiakse läbi kõik sinise mängija nupud laual */
+                    for(let i = 0; i < pOnePositions.length; i++) {
+                        /* pos on mingi positsioon sinise mängija nuppudest laual */
+                        let pos = pOnePositions[i];
+                        /* käiakse läbi kõik kombinatsioonid kus esineb positsioon millel laual vajutati */
+                        for(let j = 0; j < fourInRowDuplicateObject[pos].length; j++) {
+                            for(let k = 0; k < fourInRowDuplicateObject[pos][j].length; k++) {
+                                /* käiakse läbi individuaalse kombinatsiooni liikmed */
+                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos) {
+                                    /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
+                                    fourInRowDuplicateObject[pos][j].splice(k, 1);
+                                }
+                            }
+                        }
+                        /* eemaldan kõik sinsed positsioonid kombinatsioonide arrayst */
+                        /* saan kõikide positsioonide nimetused */
+                        for(let position in fourInRowDuplicateObject) {
+                            //console.log(position);
+                            /* käin läbi kõik kombinatsioonid mis vastavad klikitud positsioonile */
+                            fourInRowDuplicateObject[position].forEach(combination => {
+                                /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
+                                for(let l = 0; l < combination.length; l++) {
+                                    /* käin läbi individuaalse kombinatsiooniarray */
+                                    if(combination[l] === pos && combination[l] !== elPos) {
+                                        /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
+                                        combination.splice(l, 1);
+                                    }
+                                }
+                            });
+                        }
+                        /* leian kõik kombinatsioonid mille pikkus on üks, ehk selle lisamisel tekiks kolmene rida, lisan selle viimase elemendi keelatud positsioonide arraysse */
+                        for(let prohibited in fourInRowDuplicateObject) {
+                            fourInRowDuplicateObject[prohibited].forEach(prohibitedPos => {
+                                /* kombinatsiooniarray pikkus on 1 ja positsioon ei ole juba lisatud keelatud arraysse */
+                                if(prohibitedPos.length === 1 && !pOneProhibitedPositions.includes(prohibitedPos[0])) {
+                                    /* lisan positsiooni keelatud arraysse */
+                                    pOneProhibitedPositions.push(prohibitedPos[0]);
+                                }
+                            });
+                        }
+                        console.log(pOneProhibitedPositions);
+                    }
+                    
+
+
+
+
 
                     for(let i = 1; i <= 5; i++) {
                         for(let j = 1; j <= 6; j++) {
@@ -297,14 +412,12 @@ function eventListenersForSecondPhase() {
                     document.getElementById(elPos).style.color = "gold";
 
                     /* vajutatud nupu võimalikud käidavad positsioonid tehakse roheliseks ja pannakse massiivi */
-                    
                     movePiecesCombinationsObject[elPos].forEach(movePos => {
-                        if (gameTableObject[movePos] === "empty") {
+                        if (gameTableObject[movePos] === "empty" && !pOneProhibitedPositions.includes(movePos)) {
                             document.getElementById(movePos).style.backgroundColor = "lightgreen";
                             if (!greenPositions.includes(movePos)) greenPositions.push(movePos);
                         }
                     });
-                    console.log("green positions " + greenPositions);
 
                     /* tekitan funktsioonid eventlisteneri jaoks roheliste positsioonide jaoks */
                     greenPositions.forEach(greenPos => greenPositionsObject[greenPos] = function() {
@@ -335,24 +448,72 @@ function eventListenersForSecondPhase() {
 
                         /* eemaldan käima pandud evenlistenerid */
                         greenPositions.forEach(greenPosition => {
-                            console.log(greenPosition + " eemaldan eventlisteneri");
                             document.getElementById(greenPosition).removeEventListener("click", greenPositionsObject[greenPosition]);
                         });
                         greenPositions = [];
+
                         /* muudan käigu korda */
                         changeTurn = true;
                     });
 
                     /* panen eventlistenerid külge ja käivitan eelneva funktsiooni */
                     greenPositions.forEach(greenPosition => {
-                        console.log(greenPosition + " saab eventlisteneri");
                         document.getElementById(greenPosition).addEventListener("click", greenPositionsObject[greenPosition]);
                     });
+
                 }
 
 
     
                 if(player === "red" && pTwoPositions.includes(elPos)) {
+
+                    /* neljase rea loogika */
+                    
+                    /* iga kord uue duplikaatobjekti neljaste ridade loogika jaoks */
+                    let fourInRowDuplicateObject2 = JSON.parse(jsonstring2);
+                    /* käiakse läbi kõik sinise mängija nupud laual */
+                    for(let i = 0; i < pTwoPositions.length; i++) {
+                        /* pos on mingi positsioon sinise mängija nuppudest laual */
+                        let pos = pTwoPositions[i];
+                        /* käiakse läbi kõik kombinatsioonid kus esineb positsioon millel laual vajutati */
+                        for(let j = 0; j < fourInRowDuplicateObject2[pos].length; j++) {
+                            for(let k = 0; k < fourInRowDuplicateObject2[pos][j].length; k++) {
+                                /* käiakse läbi individuaalse kombinatsiooni liikmed */
+                                if(fourInRowDuplicateObject2[pos][j][k] === pos && fourInRowDuplicateObject2[pos][j][k] !== elPos) {
+                                    /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
+                                    fourInRowDuplicateObject2[pos][j].splice(k, 1);
+                                }
+                            }
+                        }
+                        /* eemaldan kõik sinsed positsioonid kombinatsioonide arrayst */
+                        /* saan kõikide positsioonide nimetused */
+                        for(let position in fourInRowDuplicateObject2) {
+                            //console.log(position);
+                            /* käin läbi kõik kombinatsioonid mis vastavad klikitud positsioonile */
+                            fourInRowDuplicateObject2[position].forEach(combination => {
+                                /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
+                                for(let l = 0; l < combination.length; l++) {
+                                    /* käin läbi individuaalse kombinatsiooniarray */
+                                    if(combination[l] === pos && combination[l] !== elPos) {
+                                        /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
+                                        combination.splice(l, 1);
+                                    }
+                                }
+                            });
+                        }
+                        /* leian kõik kombinatsioonid mille pikkus on üks, ehk selle lisamisel tekiks kolmene rida, lisan selle viimase elemendi keelatud positsioonide arraysse */
+                        for(let prohibited in fourInRowDuplicateObject2) {
+                            fourInRowDuplicateObject2[prohibited].forEach(prohibitedPos => {
+                                /* kombinatsiooniarray pikkus on 1 ja positsioon ei ole juba lisatud keelatud arraysse */
+                                if(prohibitedPos.length === 1 && !pTwoProhibitedPositions.includes(prohibitedPos[0])) {
+                                    /* lisan positsiooni keelatud arraysse */
+                                    pTwoProhibitedPositions.push(prohibitedPos[0]);
+                                }
+                            });
+                        }
+                        console.log(pTwoProhibitedPositions);
+                    }
+
 
                     for(let i = 1; i <= 5; i++) {
                         for(let j = 1; j <= 6; j++) {
@@ -369,12 +530,11 @@ function eventListenersForSecondPhase() {
                     /* vajutatud nupu võimalikud käidavad positsioonid tehakse roheliseks ja pannakse massiivi */
                     
                     movePiecesCombinationsObject[elPos].forEach(movePos => {
-                        if (gameTableObject[movePos] === "empty") {
+                        if (gameTableObject[movePos] === "empty" && !pTwoProhibitedPositions.includes(movePos)) {
                             document.getElementById(movePos).style.backgroundColor = "lightgreen";
                             if (!greenPositions.includes(movePos)) greenPositions.push(movePos);
                         }
                     });
-                    console.log(greenPositions);
 
                     /* tekitan funktsioonid eventlisteneri jaoks roheliste positsioonide jaoks */
                     greenPositions.forEach(greenPos => greenPositionsObject[greenPos] = function() {
@@ -404,16 +564,15 @@ function eventListenersForSecondPhase() {
 
                         /* eemaldan käima pandud evenlistenerid */
                         greenPositions.forEach(greenPosition => {
-                            console.log(greenPosition + "eemaldab eventlisteneri");
                             document.getElementById(greenPosition).removeEventListener("click", greenPositionsObject[greenPosition]);
                         });
                         greenPositions = [];
+
                         /* muudan käigu korda */
                         changeTurn = true;
                     });
 
                     greenPositions.forEach(greenPosition => {
-                        console.log(greenPosition + "saab eventlisteneri");
                         document.getElementById(greenPosition).addEventListener("click", greenPositionsObject[greenPosition]);
                     });
                 }
@@ -421,11 +580,9 @@ function eventListenersForSecondPhase() {
         }
     }
     pOnePositions.forEach(pOnePos => {
-        console.log(pOnePos + "saab eventlisteneri");
         document.getElementById(pOnePos).addEventListener("click", movePiecesMethodObject[pOnePos]);
     });
     pTwoPositions.forEach(pTwoPos => {
-        console.log(pTwoPos + "saab eventlisteneri");
         document.getElementById(pTwoPos).addEventListener("click", movePiecesMethodObject[pTwoPos]);
     });
     

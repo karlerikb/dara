@@ -109,8 +109,8 @@ let duplicateCombinationsObject2 = JSON.parse(jsonstring);
 
 /* duplikaatobjektid neljaste ridade jaoks */
 let jsonstring2 = JSON.stringify(fourInRowCombinationsObject);
-let fourInRowDuplicateObject = JSON.parse(jsonstring2);
-let fourInRowDuplicateObject2 = JSON.parse(jsonstring2);
+//let fourInRowDuplicateObject = JSON.parse(jsonstring2);
+//let fourInRowDuplicateObject2 = JSON.parse(jsonstring2);
 
 
 /* mängulauale klikkides vahetab mängija korda */
@@ -391,12 +391,61 @@ function eventListenersForSecondPhase() {
                                 }
                             });
                         }
-                        console.log(pOneProhibitedPositions);
+                        //console.log(pOneProhibitedPositions);
                     }
                     
 
 
+                    /* kolmese rea loomise loogika */
 
+                    let threeInRowCombinations = JSON.parse(jsonstring);
+
+                    /* käiakse läbi kõik sinise mängija nupud laual */
+                    for(let i = 0; i < pOnePositions.length; i++) {
+                        /* pos on mingi positsioon sinise mängija nuppudest laual */
+                        let pos = pOnePositions[i];
+                        /* käiakse läbi kõik kombinatsioonid kus esineb positsioon millel laual vajutati */
+                        for(let j = 0; j < fourInRowDuplicateObject[pos].length; j++) {
+                            for(let k = 0; k < fourInRowDuplicateObject[pos][j].length; k++) {
+                                /* käiakse läbi individuaalse kombinatsiooni liikmed */
+                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos) {
+                                    /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
+                                    fourInRowDuplicateObject[pos][j].splice(k, 1);
+                                }
+                            }
+                        }
+                        /* eemaldan kõik sinsed positsioonid kombinatsioonide arrayst */
+                        /* saan kõikide positsioonide nimetused */
+                        for(let position in fourInRowDuplicateObject) {
+                            //console.log(position);
+                            /* käin läbi kõik kombinatsioonid mis vastavad klikitud positsioonile */
+                            fourInRowDuplicateObject[position].forEach(combination => {
+                                /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
+                                for(let l = 0; l < combination.length; l++) {
+                                    /* käin läbi individuaalse kombinatsiooniarray */
+                                    if(combination[l] === pos && combination[l] !== elPos) {
+                                        /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
+                                        combination.splice(l, 1);
+                                    }
+                                }
+                            });
+                        }
+                        /* leian kõik kombinatsioonid mille pikkus on üks, ehk selle lisamisel tekiks kolmene rida, lisan selle viimase elemendi keelatud positsioonide arraysse */
+                        for(let prohibited in fourInRowDuplicateObject) {
+                            fourInRowDuplicateObject[prohibited].forEach(prohibitedPos => {
+                                /* kombinatsiooniarray pikkus on 1 ja positsioon ei ole juba lisatud keelatud arraysse */
+                                if(prohibitedPos.length === 1 && !pOneProhibitedPositions.includes(prohibitedPos[0])) {
+                                    /* lisan positsiooni keelatud arraysse */
+                                    pOneProhibitedPositions.push(prohibitedPos[0]);
+                                }
+                            });
+                        }
+                        //console.log(pOneProhibitedPositions);
+                    }
+
+
+                    
+                    
 
 
                     for(let i = 1; i <= 5; i++) {
@@ -511,7 +560,7 @@ function eventListenersForSecondPhase() {
                                 }
                             });
                         }
-                        console.log(pTwoProhibitedPositions);
+                        //console.log(pTwoProhibitedPositions);
                     }
 
 

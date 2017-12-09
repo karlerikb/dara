@@ -28,6 +28,7 @@ let fourInRowCombinationsArray = [];
 let threeInRowCombinationsObject = {};
 let fourInRowCombinationsObject = {};
 let movePiecesCombinationsObject = {};
+let pieces = 24;
 
 /* tekitan iga nupu jaoks objekti tühja array */
 for(let i = 1; i <= 5; i++) {
@@ -125,6 +126,8 @@ let changeTurn = true;
 /* algväärtustan mängu alguse */
 pOneTurn.innerHTML = "sinise kord"
 pOnePieces.forEach(piece => piece.style.backgroundColor = "#0074D9");
+document.getElementById("pOneColumn").style.backgroundColor = "lightblue";
+document.getElementById("playerOneTurn").style.backgroundColor = "lightblue";
 
 /* mängija käigukorra vahetamine */
 document.getElementById("gameTableContainer").addEventListener("click", () => {
@@ -133,12 +136,26 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
         if(count % 2 === 0) {
             pOnePieces.forEach(piece => piece.style.backgroundColor = "#0074D9");
             pTwoPieces.forEach(piece => piece.style.backgroundColor = "white");
+
+            document.getElementById("pOneColumn").style.backgroundColor = "lightblue";
+            document.getElementById("playerOneTurn").style.backgroundColor = "lightblue";
+
+            document.getElementById("pTwoColumn").style.backgroundColor = "white";
+            document.getElementById("playerTwoTurn").style.backgroundColor = "white";
+
             pOneTurn.innerHTML = "sinise kord";
             pTwoTurn.innerHTML = "";
             player = "blue";
         } else {
             pOnePieces.forEach(piece => piece.style.backgroundColor = "white");
             pTwoPieces.forEach(piece => piece.style.backgroundColor = "#B22222");
+
+            document.getElementById("pOneColumn").style.backgroundColor = "white";
+            document.getElementById("playerOneTurn").style.backgroundColor = "white";
+
+            document.getElementById("pTwoColumn").style.backgroundColor = "pink";
+            document.getElementById("playerTwoTurn").style.backgroundColor = "pink";
+
             pOneTurn.innerHTML = "";
             pTwoTurn.innerHTML = "punase kord";
             player = "red";
@@ -146,7 +163,7 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
     }
 
     /* teise faasi jõudmine */
-    if(pOnePieceCount + pTwoPieceCount === 10) {
+    if(pOnePieceCount + pTwoPieceCount === pieces) {
         document.querySelector("#gamePhase > p").innerHTML = "Teine faas - liiguta nuppe kolmestesse ridadesse";
         
         /* esimese asjana eemaldan kõik eelmise faasi eventlistenerid */
@@ -322,8 +339,13 @@ for(let i = 1; i <= 5; i++) {
 
 
 let greenPositionsObject = {};
+let removePlayerPiecesObject = {};
+let mouseOverObject = {};
+let mouseOutObject = {};
 let greenPositions = [];
 let currentPos;
+let pOneThreeInRowPositions = [];
+let pTwoThreeInRowPositions = [];
 
 /* eventlistenerid teise faasi jaoks */
 function eventListenersForSecondPhase() {
@@ -345,6 +367,8 @@ function eventListenersForSecondPhase() {
                     greenPositions = [];
                 }
 
+
+
                 if(player === "blue" && pOnePositions.includes(elPos) && !pOneProhibitedPositions.includes(elPos)) {
 
                     /* neljase rea loogika */
@@ -359,7 +383,7 @@ function eventListenersForSecondPhase() {
                         for(let j = 0; j < fourInRowDuplicateObject[pos].length; j++) {
                             for(let k = 0; k < fourInRowDuplicateObject[pos][j].length; k++) {
                                 /* käiakse läbi individuaalse kombinatsiooni liikmed */
-                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos) {
+                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos && !pOneThreeInRowPositions.includes(pos)) {
                                     /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
                                     fourInRowDuplicateObject[pos][j].splice(k, 1);
                                 }
@@ -374,7 +398,7 @@ function eventListenersForSecondPhase() {
                                 /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
                                 for(let l = 0; l < combination.length; l++) {
                                     /* käin läbi individuaalse kombinatsiooniarray */
-                                    if(combination[l] === pos && combination[l] !== elPos) {
+                                    if(combination[l] === pos && combination[l] !== elPos && !pOneThreeInRowPositions.includes(pos)) {
                                         /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
                                         combination.splice(l, 1);
                                     }
@@ -393,58 +417,6 @@ function eventListenersForSecondPhase() {
                         }
                         //console.log(pOneProhibitedPositions);
                     }
-                    
-
-
-                    /* kolmese rea loomise loogika */
-
-                    let threeInRowCombinations = JSON.parse(jsonstring);
-
-                    /* käiakse läbi kõik sinise mängija nupud laual */
-                    for(let i = 0; i < pOnePositions.length; i++) {
-                        /* pos on mingi positsioon sinise mängija nuppudest laual */
-                        let pos = pOnePositions[i];
-                        /* käiakse läbi kõik kombinatsioonid kus esineb positsioon millel laual vajutati */
-                        for(let j = 0; j < fourInRowDuplicateObject[pos].length; j++) {
-                            for(let k = 0; k < fourInRowDuplicateObject[pos][j].length; k++) {
-                                /* käiakse läbi individuaalse kombinatsiooni liikmed */
-                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos) {
-                                    /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
-                                    fourInRowDuplicateObject[pos][j].splice(k, 1);
-                                }
-                            }
-                        }
-                        /* eemaldan kõik sinsed positsioonid kombinatsioonide arrayst */
-                        /* saan kõikide positsioonide nimetused */
-                        for(let position in fourInRowDuplicateObject) {
-                            //console.log(position);
-                            /* käin läbi kõik kombinatsioonid mis vastavad klikitud positsioonile */
-                            fourInRowDuplicateObject[position].forEach(combination => {
-                                /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
-                                for(let l = 0; l < combination.length; l++) {
-                                    /* käin läbi individuaalse kombinatsiooniarray */
-                                    if(combination[l] === pos && combination[l] !== elPos) {
-                                        /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
-                                        combination.splice(l, 1);
-                                    }
-                                }
-                            });
-                        }
-                        /* leian kõik kombinatsioonid mille pikkus on üks, ehk selle lisamisel tekiks kolmene rida, lisan selle viimase elemendi keelatud positsioonide arraysse */
-                        for(let prohibited in fourInRowDuplicateObject) {
-                            fourInRowDuplicateObject[prohibited].forEach(prohibitedPos => {
-                                /* kombinatsiooniarray pikkus on 1 ja positsioon ei ole juba lisatud keelatud arraysse */
-                                if(prohibitedPos.length === 1 && !pOneProhibitedPositions.includes(prohibitedPos[0])) {
-                                    /* lisan positsiooni keelatud arraysse */
-                                    pOneProhibitedPositions.push(prohibitedPos[0]);
-                                }
-                            });
-                        }
-                        //console.log(pOneProhibitedPositions);
-                    }
-
-
-                    
                     
 
 
@@ -453,7 +425,7 @@ function eventListenersForSecondPhase() {
                             let elPos = "pos" + i + j;
                             if (gameTableObject[elPos] === "empty")
                                 document.getElementById(elPos).style.backgroundColor = "white";
-                            if (gameTableObject[elPos] === "blue")
+                            if (gameTableObject[elPos] === "blue" && !pOneThreeInRowPositions.includes(elPos))
                                 document.getElementById(elPos).style.color = "black";
                         }
                     }
@@ -465,6 +437,12 @@ function eventListenersForSecondPhase() {
                         if (gameTableObject[movePos] === "empty" && !pOneProhibitedPositions.includes(movePos)) {
                             document.getElementById(movePos).style.backgroundColor = "lightgreen";
                             if (!greenPositions.includes(movePos)) greenPositions.push(movePos);
+                        }
+                    });
+
+                    greenPositions.forEach(function(greenPos) {
+                        greenPositionsObject[greenPos] = function() {
+
                         }
                     });
 
@@ -490,6 +468,7 @@ function eventListenersForSecondPhase() {
                         }
                         pOnePositions.push(greenPos);
 
+
                         /* kohandan nuppude liigutamise eventlistenerid */
                         document.getElementById(elPos).removeEventListener("click", movePiecesMethodObject[elPos]);
                         document.getElementById(greenPos).addEventListener("click", movePiecesMethodObject[greenPos]);
@@ -501,8 +480,105 @@ function eventListenersForSecondPhase() {
                         });
                         greenPositions = [];
 
-                        /* muudan käigu korda */
-                        changeTurn = true;
+
+                        /* siia uus kolmeste ridade tekkimise loogika */
+                        let threeInRowCombination = false;
+                        /* vaadatakse läbi kas mängija võimalike käikude tulemusena on tekkimas kolmene rida */
+                        for(let i = 0; i < threeInRowCombinationsObject[greenPos].length; i++) {
+                            let threeInRow = threeInRowCombinationsObject[greenPos][i].every(position => {
+                                return threeInRowCombinationsObject[greenPos][i].includes(position) && pOnePositions.includes(position) && !pOneThreeInRowPositions.includes(position);
+                            });
+                            /* kui selline kombinatsioon leitakse ja mängija selle valib, märgitakse ära kolmene rida */
+                            if(threeInRow) {
+                                threeInRowCombinationsObject[greenPos][i].forEach(position => {
+                                    document.getElementById(position).innerText = "*";
+                                    document.getElementById(position).style.textAlign = "center";
+                                    document.getElementById(position).style.color = "gold";
+                                    if(!pOneThreeInRowPositions.includes(position))
+                                        pOneThreeInRowPositions.push(position);
+                                    console.log(position);
+                                    document.getElementById(position).removeEventListener("click", movePiecesMethodObject[position]);
+                                });
+                            threeInRowCombination = true;
+                            }
+                        }
+
+                        /* kui esineb kolmene rida käivitatakse vastase nupu eemaldamise funktsionaalsus */
+                        if(threeInRowCombination) {
+                            /* vaadatakse läbi kõik vastase positsioonid */
+                            pTwoPositions.forEach(pTwoPos => {
+                                /* kui vastase positsioon ei kuulu kolmesesse ritta */
+                                if(!pTwoThreeInRowPositions.includes(pTwoPos)) {
+
+                                    /* tehakse funktsioon nupu eemaldamiseks */
+                                    removePlayerPiecesObject[pTwoPos] = function() {
+                                        console.log("click event " + pTwoPos);
+                                        /* kui klikin siis eemaldatakse mouseover ja mouseout evendid, positsioon valgeks, eemaldatakse kiri "eemalda nupp" */
+                                        document.getElementById(pTwoPos).removeEventListener("mouseover", mouseOverObject[pTwoPos]);
+                                        document.getElementById(pTwoPos).removeEventListener("mouseout", mouseOutObject[pTwoPos]);
+                                        document.getElementById(pTwoPos).style.backgroundColor = "white";
+                                        document.querySelectorAll("#gamePhase > p")[1].innerText = "";
+                                        /* eemaldatakse eemaldatud nupp punase mängija nuppude massiivist ja märgitakse laual see nupp vabaks olevaks */
+                                        for(let i = 0; i < pTwoPositions.length; i++) {
+                                            if(pTwoPos === pTwoPositions[i])
+                                                pTwoPositions.splice(i, 1);
+                                        }
+                                        gameTableObject[pTwoPos] = "empty";
+                                        /* eemaldan nupu kohta käivad eventlistenerid */
+                                        document.getElementById(pTwoPos).removeEventListener("click", movePiecesMethodObject[pTwoPos]);
+                                        document.getElementById(pTwoPos).removeEventListener("click", removePlayerPiecesObject[pTwoPos]);
+                                        /* eemaldan kõikidelt teistelt nuppudelt eemaldamise eventlistenerid */
+                                        pTwoPositions.forEach(pTwoPos => {
+                                            document.getElementById(pTwoPos).removeEventListener("click", removePlayerPiecesObject[pTwoPos]);
+                                            document.getElementById(pTwoPos).removeEventListener("mouseover", mouseOverObject[pTwoPos]);
+                                            document.getElementById(pTwoPos).removeEventListener("mouseout", mouseOutObject[pTwoPos]);
+                                        });
+
+                                        pOnePositions.forEach(pOnePos => {
+                                            if(!pOneThreeInRowPositions.includes(pOnePos))
+                                                document.getElementById(pOnePos).addEventListener("click", movePiecesMethodObject[pOnePos]);
+                                        });
+
+                                        /* muudan mängukorda */
+                                        changeTurn = true;
+                                    }
+                                }
+                            });
+
+                            pTwoPositions.forEach(pTwoPos => {
+                                /* kui vastase positsioon ei kuulu kolmesesse ritta */
+                                if(!pTwoThreeInRowPositions.includes(pTwoPos)) {
+
+                                    /* funktsioon mouseover evendi jaoks */
+                                    mouseOverObject[pTwoPos] = function() {
+                                        document.getElementById(pTwoPos).style.backgroundColor = "red";
+                                    };
+
+                                    /* funktsioon mouseout evendi jaoks */
+                                     mouseOutObject[pTwoPos] = function() {
+                                        document.getElementById(pTwoPos).style.backgroundColor = "#B22222";
+                                     };
+                                }
+                            });
+
+                            pTwoPositions.forEach(pTwoPos => {
+                                if(!pTwoThreeInRowPositions.includes(pTwoPos)) {
+                                    document.getElementById(pTwoPos).addEventListener("click", removePlayerPiecesObject[pTwoPos]);
+                                    document.getElementById(pTwoPos).addEventListener("mouseover", mouseOverObject[pTwoPos]);
+                                    document.getElementById(pTwoPos).addEventListener("mouseout", mouseOutObject[pTwoPos]);
+                                }
+                            });
+
+                            changeTurn = false;
+                            document.querySelectorAll("#gamePhase > p")[1].innerText = "Eemalda vastase nupp!";
+                            pOnePositions.forEach(pOnePos => {
+                                document.getElementById(pOnePos).removeEventListener("click", movePiecesMethodObject[pOnePos]);
+                            });
+
+                        } else {
+                            /* muudan käigu korda */
+                            changeTurn = true;
+                        }
                     });
 
                     /* panen eventlistenerid külge ja käivitan eelneva funktsiooni */
@@ -520,7 +596,7 @@ function eventListenersForSecondPhase() {
                     
                     /* iga kord uue duplikaatobjekti neljaste ridade loogika jaoks */
                     let fourInRowDuplicateObject2 = JSON.parse(jsonstring2);
-                    /* käiakse läbi kõik sinise mängija nupud laual */
+                    /* käiakse läbi kõik punase mängija nupud laual */
                     for(let i = 0; i < pTwoPositions.length; i++) {
                         /* pos on mingi positsioon sinise mängija nuppudest laual */
                         let pos = pTwoPositions[i];
@@ -528,13 +604,13 @@ function eventListenersForSecondPhase() {
                         for(let j = 0; j < fourInRowDuplicateObject2[pos].length; j++) {
                             for(let k = 0; k < fourInRowDuplicateObject2[pos][j].length; k++) {
                                 /* käiakse läbi individuaalse kombinatsiooni liikmed */
-                                if(fourInRowDuplicateObject2[pos][j][k] === pos && fourInRowDuplicateObject2[pos][j][k] !== elPos) {
+                                if(fourInRowDuplicateObject2[pos][j][k] === pos && fourInRowDuplicateObject2[pos][j][k] !== elPos && !pTwoThreeInRowPositions.includes(pos)) {
                                     /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
                                     fourInRowDuplicateObject2[pos][j].splice(k, 1);
                                 }
                             }
                         }
-                        /* eemaldan kõik sinsed positsioonid kombinatsioonide arrayst */
+                        /* eemaldan kõik punased positsioonid kombinatsioonide arrayst */
                         /* saan kõikide positsioonide nimetused */
                         for(let position in fourInRowDuplicateObject2) {
                             //console.log(position);
@@ -543,8 +619,8 @@ function eventListenersForSecondPhase() {
                                 /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
                                 for(let l = 0; l < combination.length; l++) {
                                     /* käin läbi individuaalse kombinatsiooniarray */
-                                    if(combination[l] === pos && combination[l] !== elPos) {
-                                        /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
+                                    if(combination[l] === pos && combination[l] !== elPos && !pTwoThreeInRowPositions.includes(pos)) {
+                                        /* kui kombinatsioonist leian punase positsiooni eemaldan arrayst */
                                         combination.splice(l, 1);
                                     }
                                 }
@@ -569,7 +645,7 @@ function eventListenersForSecondPhase() {
                             let elPos = "pos" + i + j;
                             if (gameTableObject[elPos] === "empty")
                                 document.getElementById(elPos).style.backgroundColor = "white";
-                            if (gameTableObject[elPos] === "red")
+                            if (gameTableObject[elPos] === "red" && !pTwoThreeInRowPositions.includes(elPos))
                                 document.getElementById(elPos).style.color = "black";
                         }
                     }
@@ -617,8 +693,107 @@ function eventListenersForSecondPhase() {
                         });
                         greenPositions = [];
 
-                        /* muudan käigu korda */
-                        changeTurn = true;
+
+
+
+
+                        /* siia uus kolmeste ridade tekkimise loogika */
+                        let threeInRowCombination = false;
+                        /* vaadatakse läbi kas mängija võimalike käikude tulemusena on tekkimas kolmene rida */
+                        for(let i = 0; i < threeInRowCombinationsObject[greenPos].length; i++) {
+                            let threeInRow = threeInRowCombinationsObject[greenPos][i].every(position => {
+                                return threeInRowCombinationsObject[greenPos][i].includes(position) && pTwoPositions.includes(position) && !pTwoThreeInRowPositions.includes(position);
+                            });
+                            /* kui selline kombinatsioon leitakse ja mängija selle valib, märgitakse ära kolmene rida */
+                            if(threeInRow) {
+                                threeInRowCombinationsObject[greenPos][i].forEach(position => {
+                                    document.getElementById(position).innerText = "*";
+                                    document.getElementById(position).style.textAlign = "center";
+                                    document.getElementById(position).style.color = "gold";
+                                    if(!pTwoThreeInRowPositions.includes(position))
+                                        pTwoThreeInRowPositions.push(position);
+                                    document.getElementById(position).removeEventListener("click", movePiecesMethodObject[position]);
+                                });
+                            threeInRowCombination = true;
+                            }
+                        }
+
+                        /* kui esineb kolmene rida käivitatakse vastase nupu eemaldamise funktsionaalsus */
+                        if(threeInRowCombination) {
+                            /* vaadatakse läbi kõik vastase positsioonid */
+                            pOnePositions.forEach(pOnePos => {
+                                /* kui vastase positsioon ei kuulu kolmesesse ritta */
+                                if(!pOneThreeInRowPositions.includes(pOnePos)) {
+
+                                    /* tehakse funktsioon nupu eemaldamiseks */
+                                    removePlayerPiecesObject[pOnePos] = function() {
+                                        console.log("click event " + pOnePos);
+                                        /* kui klikin siis eemaldatakse mouseover ja mouseout evendid, positsioon valgeks, eemaldatakse kiri "eemalda nupp" */
+                                        document.getElementById(pOnePos).removeEventListener("mouseover", mouseOverObject[pOnePos]);
+                                        document.getElementById(pOnePos).removeEventListener("mouseout", mouseOutObject[pOnePos]);
+                                        document.getElementById(pOnePos).style.backgroundColor = "white";
+                                        document.querySelectorAll("#gamePhase > p")[1].innerText = "";
+                                        /* eemaldatakse eemaldatud nupp punase mängija nuppude massiivist ja märgitakse laual see nupp vabaks olevaks */
+                                        for(let i = 0; i < pOnePositions.length; i++) {
+                                            if(pOnePos === pOnePositions[i])
+                                                pOnePositions.splice(i, 1);
+                                        }
+                                        gameTableObject[pOnePos] = "empty";
+                                        /* eemaldan nupu kohta käivad eventlistenerid */
+                                        document.getElementById(pOnePos).removeEventListener("click", movePiecesMethodObject[pOnePos]);
+                                        document.getElementById(pOnePos).removeEventListener("click", removePlayerPiecesObject[pOnePos]);
+                                        /* eemaldan kõikidelt teistelt nuppudelt eemaldamise eventlistenerid */
+                                        pOnePositions.forEach(pOnePos => {
+                                            document.getElementById(pOnePos).removeEventListener("click", removePlayerPiecesObject[pOnePos]);
+                                            document.getElementById(pOnePos).removeEventListener("mouseover", mouseOverObject[pOnePos]);
+                                            document.getElementById(pOnePos).removeEventListener("mouseout", mouseOutObject[pOnePos]);
+                                        });
+
+                                        pTwoPositions.forEach(pTwoPos => {
+                                            if(!pTwoThreeInRowPositions.includes(pTwoPos))
+                                                document.getElementById(pTwoPos).addEventListener("click", movePiecesMethodObject[pTwoPos]);
+                                        });
+
+                                        /* muudan mängukorda */
+                                        changeTurn = true;
+                                    }
+                                }
+                            });
+
+                            pOnePositions.forEach(pOnePos => {
+                                /* kui vastase positsioon ei kuulu kolmesesse ritta */
+                                if(!pOneThreeInRowPositions.includes(pOnePos)) {
+
+                                    /* funktsioon mouseover evendi jaoks */
+                                    mouseOverObject[pOnePos] = function() {
+                                        document.getElementById(pOnePos).style.backgroundColor = "blue";
+                                    };
+
+                                    /* funktsioon mouseout evendi jaoks */
+                                    mouseOutObject[pOnePos] = function() {
+                                        document.getElementById(pOnePos).style.backgroundColor = "#0074D9";
+                                    };
+                                }
+                            });
+
+                            pOnePositions.forEach(pOnePos => {
+                                if(!pOneThreeInRowPositions.includes(pOnePos)) {
+                                    document.getElementById(pOnePos).addEventListener("click", removePlayerPiecesObject[pOnePos]);
+                                    document.getElementById(pOnePos).addEventListener("mouseover", mouseOverObject[pOnePos]);
+                                    document.getElementById(pOnePos).addEventListener("mouseout", mouseOutObject[pOnePos]);
+                                }
+                            });
+
+                            changeTurn = false;
+                            document.querySelectorAll("#gamePhase > p")[1].innerText = "Eemalda vastase nupp!";
+                            pTwoPositions.forEach(pTwoPos => {
+                                document.getElementById(pTwoPos).removeEventListener("click", movePiecesMethodObject[pTwoPos]);
+                            });
+
+                        } else {
+                            /* muudan käigu korda */
+                            changeTurn = true;
+                        }
                     });
 
                     greenPositions.forEach(greenPosition => {

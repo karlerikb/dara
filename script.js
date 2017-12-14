@@ -122,6 +122,7 @@ const pTwoTurn = document.getElementById("playerTwoTurn");
 let count = 0;
 let player = "blue";
 let changeTurn = true;
+const mukumbuPics = ["1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png", "9.png", "10.png", "11.gif"];
 
 /* algväärtustan mängu alguse */
 pOneTurn.innerHTML = "sinise kord"
@@ -146,6 +147,9 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
             pOneTurn.innerHTML = "sinise kord";
             pTwoTurn.innerHTML = "";
             player = "blue";
+
+            document.getElementById("mukumbu").innerHTML = "<img src='pics/" + mukumbuPics[Math.floor(Math.random() * 11)] + "'>";
+
         } else {
             pOnePieces.forEach(piece => piece.style.backgroundColor = "white");
             pTwoPieces.forEach(piece => piece.style.backgroundColor = "#B22222");
@@ -159,6 +163,9 @@ document.getElementById("gameTableContainer").addEventListener("click", () => {
             pOneTurn.innerHTML = "";
             pTwoTurn.innerHTML = "punase kord";
             player = "red";
+
+            document.getElementById("mukumbu").innerHTML = "<img src='pics/" + mukumbuPics[Math.floor(Math.random() * 11)] + "'>";
+
         }
     }
 

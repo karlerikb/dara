@@ -21,6 +21,20 @@ const pos41 = document.getElementById("pos41"), pos42 = document.getElementById(
 const pos51 = document.getElementById("pos51"), pos52 = document.getElementById("pos52"), pos53 = document.getElementById("pos53"), pos54 = document.getElementById("pos54"), pos55 = document.getElementById("pos55"), pos56 = document.getElementById("pos56");
 */
 
+const pic1 = new Image(), pic2 = new Image(), pic3 = new Image(), pic4 = new Image(), pic5 = new Image(), pic6 = new Image();
+const pic7 = new Image(), pic8 = new Image(), pic9 = new Image(), pic10 = new Image(), pic11 = new Image();
+pic1.src = "pics/1.png";
+pic2.src = "pics/2.png";
+pic3.src = "pics/3.png";
+pic4.src = "pics/4.png";
+pic5.src = "pics/5.png";
+pic6.src = "pics/6.png";
+pic7.src = "pics/7.png";
+pic8.src = "pics/8.png";
+pic9.src = "pics/9.png";
+pic10.src = "pics/10.png";
+pic11.src = "pics/11.png";
+
 
 /* kolmeste ridade kombinatsioonide loomine */
 let threeInRowCombinationsArray = [];

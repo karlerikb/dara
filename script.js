@@ -383,7 +383,7 @@ function eventListenersForSecondPhase() {
                         for(let j = 0; j < fourInRowDuplicateObject[pos].length; j++) {
                             for(let k = 0; k < fourInRowDuplicateObject[pos][j].length; k++) {
                                 /* käiakse läbi individuaalse kombinatsiooni liikmed */
-                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos && !pOneThreeInRowPositions.includes(pos)) {
+                                if(fourInRowDuplicateObject[pos][j][k] === pos && fourInRowDuplicateObject[pos][j][k] !== elPos) {
                                     /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
                                     fourInRowDuplicateObject[pos][j].splice(k, 1);
                                 }
@@ -398,7 +398,7 @@ function eventListenersForSecondPhase() {
                                 /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
                                 for(let l = 0; l < combination.length; l++) {
                                     /* käin läbi individuaalse kombinatsiooniarray */
-                                    if(combination[l] === pos && combination[l] !== elPos && !pOneThreeInRowPositions.includes(pos)) {
+                                    if(combination[l] === pos && combination[l] !== elPos) {
                                         /* kui kombinatsioonist leian sinise positsiooni eemaldan arrayst */
                                         combination.splice(l, 1);
                                     }
@@ -604,7 +604,7 @@ function eventListenersForSecondPhase() {
                         for(let j = 0; j < fourInRowDuplicateObject2[pos].length; j++) {
                             for(let k = 0; k < fourInRowDuplicateObject2[pos][j].length; k++) {
                                 /* käiakse läbi individuaalse kombinatsiooni liikmed */
-                                if(fourInRowDuplicateObject2[pos][j][k] === pos && fourInRowDuplicateObject2[pos][j][k] !== elPos && !pTwoThreeInRowPositions.includes(pos)) {
+                                if(fourInRowDuplicateObject2[pos][j][k] === pos && fourInRowDuplicateObject2[pos][j][k] !== elPos) {
                                     /* kui vajutatud positsioon on leitud, eemaldatakse kombinatsiooni elementide seast */
                                     fourInRowDuplicateObject2[pos][j].splice(k, 1);
                                 }
@@ -619,7 +619,7 @@ function eventListenersForSecondPhase() {
                                 /* iga liige on uus array, array sees on arrayd kombinatsioonidega */
                                 for(let l = 0; l < combination.length; l++) {
                                     /* käin läbi individuaalse kombinatsiooniarray */
-                                    if(combination[l] === pos && combination[l] !== elPos && !pTwoThreeInRowPositions.includes(pos)) {
+                                    if(combination[l] === pos && combination[l] !== elPos) {
                                         /* kui kombinatsioonist leian punase positsiooni eemaldan arrayst */
                                         combination.splice(l, 1);
                                     }
